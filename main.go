@@ -24,7 +24,27 @@ func main() {
 	}
 
 	// Initialize services
-	githubClient := github.NewGithubClient(cfg.GithubToken)
+	var githubClient github.Client
+	var err error
+
+	// Choose authentication method based on available credentials
+	if cfg.GithubAppID != 0 && cfg.GithubAppPrivateKey != "" && cfg.GithubAppInstallationID != 0 {
+		// Use GitHub App authentication
+		log.Println("Using GitHub App authentication")
+		githubClient, err = github.NewGithubAppClient(
+			cfg.GithubAppID,
+			cfg.GithubAppPrivateKey,
+			cfg.GithubAppInstallationID,
+		)
+		if err != nil {
+			log.Fatalf("Failed to create GitHub App client: %v", err)
+		}
+	} else {
+		// Fall back to token-based authentication
+		log.Println("Using token-based authentication")
+		githubClient = github.NewGithubClient(cfg.GithubToken)
+	}
+
 	aiService := ai.NewDeepSeekService(cfg.DeepSeekKey)
 	prAnalyzer := analyzer.NewPRAnalyzer(githubClient, aiService)
 
@@ -38,7 +58,7 @@ func main() {
 	ctx := context.Background()
 
 	// Analyze the PR
-	err := prAnalyzer.AnalyzePR(ctx, owner, repo, prNumber)
+	err = prAnalyzer.AnalyzePR(ctx, owner, repo, prNumber)
 	if err != nil {
 		log.Fatalf("Failed to analyze PR: %v", err)
 	}
