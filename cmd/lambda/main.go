@@ -75,10 +75,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	// Choose authentication method based on available credentials
 	if cfg.GithubAppPrivateKey != "" {
-		// Use GitHub App authentication
-		log.Println("Using GitHub App authentication")
-		log.Println("App ID:", cfg.GithubAppID)
-		log.Println("Installation ID:", prEvent.Installation.ID)
 
 		githubClient, err = github.NewGithubAppClient(
 			cfg.GithubAppID,
