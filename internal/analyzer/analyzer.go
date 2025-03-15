@@ -45,8 +45,6 @@ func (a *PRAnalyzer) AnalyzePR(ctx context.Context, owner, repo string, prNumber
 		return fmt.Errorf("failed to get PR diff: %w", err)
 	}
 
-	fmt.Println(diff)
-
 	// Skip if diff is too large or empty
 	if len(diff) == 0 {
 		log.Printf("Empty diff for PR #%d, skipping", prNumber)

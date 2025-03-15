@@ -1,28 +1,22 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
-// Config holds the application configuration
 type Config struct {
-	GithubToken string
-	DeepSeekKey string
-	// Add GitHub App credentials
+	GithubToken             string
+	DeepSeekKey             string
 	GithubAppID             int64
 	GithubAppPrivateKey     string
 	GithubAppInstallationID int64
 }
 
-// LoadConfig loads the configuration from environment variables
 func LoadConfig() *Config {
-	// Get the private key, handling newlines properly
 	privateKey := getEnv("GITHUB_APP_PRIVATE_KEY", "")
 
-	// If the private key doesn't contain proper newlines, replace "\n" with actual newlines
 	if privateKey != "" && !strings.Contains(privateKey, "-----BEGIN RSA PRIVATE KEY-----\n") {
 		privateKey = strings.ReplaceAll(privateKey, "\\n", "\n")
 	}
@@ -50,13 +44,6 @@ func (c *Config) Validate() bool {
 	// Check if we have either token-based auth or app-based auth
 	hasTokenAuth := c.GithubToken != ""
 	hasAppAuth := c.GithubAppID != 0 && c.GithubAppPrivateKey != "" && c.GithubAppInstallationID != 0
-
-	fmt.Println("hasAppAuth", hasAppAuth)
-	fmt.Println("hasTokenAuth", hasTokenAuth)
-	fmt.Println("DeepSeekKey", c.DeepSeekKey)
-	fmt.Println("GithubAppID", c.GithubAppID)
-	fmt.Println("GithubAppPrivateKey", c.GithubAppPrivateKey)
-	fmt.Println("GithubAppInstallationID", c.GithubAppInstallationID)
 
 	return (hasTokenAuth || hasAppAuth) && c.DeepSeekKey != ""
 }
