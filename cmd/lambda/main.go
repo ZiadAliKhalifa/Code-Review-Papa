@@ -27,6 +27,9 @@ type PREvent struct {
 			Login string `json:"login"`
 		} `json:"owner"`
 	} `json:"repository"`
+	Installation struct {
+		ID int64 `json:"id"`
+	} `json:"installation"`
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -34,6 +37,8 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	log.SetOutput(os.Stdout)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("Starting Code Review Papa Lambda")
+
+	log.Println("Request body:", request.Body)
 
 	// Parse the webhook payload
 	var prEvent PREvent
@@ -69,13 +74,12 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	var err error
 
 	// Choose authentication method based on available credentials
-	if cfg.GithubAppID != 0 && cfg.GithubAppPrivateKey != "" && cfg.GithubAppInstallationID != 0 {
-		// Use GitHub App authentication
-		log.Println("Using GitHub App authentication")
+	if cfg.GithubAppPrivateKey != "" {
+
 		githubClient, err = github.NewGithubAppClient(
 			cfg.GithubAppID,
 			cfg.GithubAppPrivateKey,
-			cfg.GithubAppInstallationID,
+			prEvent.Installation.ID,
 		)
 		if err != nil {
 			log.Printf("Failed to create GitHub App client: %v", err)
