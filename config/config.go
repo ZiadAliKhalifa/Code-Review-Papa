@@ -7,11 +7,10 @@ import (
 )
 
 type Config struct {
-	GithubToken             string
-	DeepSeekKey             string
-	GithubAppID             int64
-	GithubAppPrivateKey     string
-	GithubAppInstallationID int64
+	GithubToken         string
+	DeepSeekKey         string
+	GithubAppID         int64
+	GithubAppPrivateKey string
 }
 
 func LoadConfig() *Config {
@@ -31,11 +30,10 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		GithubToken:             getEnv("GITHUB_TOKEN", ""),
-		DeepSeekKey:             getEnv("DEEPSEEK_KEY", ""),
-		GithubAppID:             getEnvAsInt64("GITHUB_APP_ID", 0),
-		GithubAppPrivateKey:     privateKey,
-		GithubAppInstallationID: getEnvAsInt64("GITHUB_APP_INSTALLATION_ID", 0),
+		GithubToken:         getEnv("GITHUB_TOKEN", ""),
+		DeepSeekKey:         getEnv("DEEPSEEK_KEY", ""),
+		GithubAppID:         getEnvAsInt64("GITHUB_APP_ID", 0),
+		GithubAppPrivateKey: privateKey,
 	}
 }
 
@@ -43,7 +41,7 @@ func LoadConfig() *Config {
 func (c *Config) Validate() bool {
 	// Check if we have either token-based auth or app-based auth
 	hasTokenAuth := c.GithubToken != ""
-	hasAppAuth := c.GithubAppID != 0 && c.GithubAppPrivateKey != "" && c.GithubAppInstallationID != 0
+	hasAppAuth := c.GithubAppPrivateKey != ""
 
 	return (hasTokenAuth || hasAppAuth) && c.DeepSeekKey != ""
 }
