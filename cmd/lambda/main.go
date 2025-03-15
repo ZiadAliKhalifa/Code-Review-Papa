@@ -51,7 +51,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// Only process opened or synchronize (new commits) events
-	if prEvent.Action != "opened" && prEvent.Action != "synchronize" {
+	if prEvent.Action != "opened" && prEvent.Action != "synchronize" && prEvent.Action != "reopened" && prEvent.Action != "edited" {
 		log.Printf("Ignoring PR event with action: %s", prEvent.Action)
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
