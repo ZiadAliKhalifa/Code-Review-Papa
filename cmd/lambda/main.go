@@ -73,27 +73,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	var githubClient github.Client
 	var err error
 
-	// Choose authentication method based on available credentials
-	if cfg.GithubAppPrivateKey != "" {
-
-		githubClient, err = github.NewGithubAppClient(
-			cfg.GithubAppID,
-			cfg.GithubAppPrivateKey,
-			prEvent.Installation.ID,
-		)
-		if err != nil {
-			log.Printf("Failed to create GitHub App client: %v", err)
-			return events.APIGatewayProxyResponse{
-				StatusCode: 500,
-				Body:       "Failed to initialize GitHub client",
-			}, nil
-		}
-	} else {
-		// Fall back to token-based authentication
-		log.Println("Using token-based authentication")
-		githubClient = github.NewGithubClient(cfg.GithubToken)
-	}
-
 	aiService := ai.NewDeepSeekService(cfg.DeepSeekKey)
 	prAnalyzer := analyzer.NewPRAnalyzer(githubClient, aiService)
 
