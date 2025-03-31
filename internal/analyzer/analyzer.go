@@ -94,19 +94,24 @@ I've analyzed this pull request and have some feedback for you!
 	// Clean up the analysis formatting for better GitHub display
 	cleanedAnalysis := analysis
 	
-	// Ensure proper code block formatting
-	cleanedAnalysis = strings.ReplaceAll(cleanedAnalysis, "```", "\n```\n")
+	// Apply regex-based formatting cleanup
+	// Ensure proper code block formatting with newlines before and after
+	codeBlockPattern := regexp.MustCompile("```(.*?)```")
+	cleanedAnalysis = codeBlockPattern.ReplaceAllStringFunc(cleanedAnalysis, func(match string) string {
+		return "\n" + match + "\n"
+	})
 	
-	// Ensure headers have proper spacing
-	headerPattern := regexp.MustCompile(`(?m)^###\s`)
-	cleanedAnalysis = headerPattern.ReplaceAllString(cleanedAnalysis, "\n### ")
+	// Ensure headers have proper spacing (add newline before headers)
+	headerPattern := regexp.MustCompile(`(?m)^(#+)\s+(.+)$`)
+	cleanedAnalysis = headerPattern.ReplaceAllString(cleanedAnalysis, "\n$1 $2")
 	
-	// Ensure list items are properly formatted
-	listItemPattern := regexp.MustCompile(`(?m)^-\s`)
-	cleanedAnalysis = listItemPattern.ReplaceAllString(cleanedAnalysis, "\n- ")
+	// Ensure list items are properly formatted (add newline before list items)
+	listItemPattern := regexp.MustCompile(`(?m)^(\s*[-*])\s+(.+)$`)
+	cleanedAnalysis = listItemPattern.ReplaceAllString(cleanedAnalysis, "\n$1 $2")
 	
-	// Fix double spacing issues
-	cleanedAnalysis = strings.ReplaceAll(cleanedAnalysis, "\n\n\n", "\n\n")
+	// Fix multiple consecutive newlines (more than 2) to just 2
+	multipleNewlinesPattern := regexp.MustCompile(`\n{3,}`)
+	cleanedAnalysis = multipleNewlinesPattern.ReplaceAllString(cleanedAnalysis, "\n\n")
 	
 	// Ensure the analysis doesn't have duplicate headers
 	if strings.Contains(strings.ToLower(cleanedAnalysis), "code review") {
