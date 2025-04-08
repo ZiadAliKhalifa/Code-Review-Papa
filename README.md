@@ -5,6 +5,7 @@ An AI-powered code review assistant that automatically analyzes pull requests an
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ziadalikhalifa/code-review-papa)](https://goreportcard.com/report/github.com/ziadalikhalifa/code-review-papa)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub Actions Workflow Status](https://github.com/ziadalikhalifa/code-review-papa/actions/workflows/build_and_deploy.yml/badge.svg)
 
 ## Features
 
