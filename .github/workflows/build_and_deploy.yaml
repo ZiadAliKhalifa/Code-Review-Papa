@@ -1,33 +1,47 @@
-name: code-review-papa
+name: Build and Deploy Lambda
+
 on:
   push:
-    branches: [master]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for AWS OIDC
+      contents: read # Required to checkout the code
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: "1.23"
+          go-version: '1.21' # Adjust if needed, but 1.21 is a recent LTS
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests # NEW STEP
+        run: make test
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }} # Store your IAM Role ARN in GitHub Secrets
+          aws-region: ${{ secrets.AWS_REGION }} # Store your AWS Region in GitHub Secrets
 
-      - name: Build application
+      - name: Build Lambda
         run: make build
 
-      - name: Deploy application
+      # Note: Actual deployment should only run on merge to main, not on PRs.
+      # This example deploys on every push to main.
+      # Consider adding a condition: if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Deploy Lambda
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: make deploy
-        env:
-          GITHUB_APP_ID: ${{ secrets.APP_ID }}
-          GITHUB_APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-          DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_KEY }}

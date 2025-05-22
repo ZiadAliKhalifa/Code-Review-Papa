@@ -45,6 +45,16 @@ Build the application:
 make build
 ```
 
+### Running Tests
+
+Unit tests have been added to ensure code quality and stability. You can run all tests using:
+
+```sh
+make test
+```
+
+This command will execute all unit tests within the project and provide verbose output.
+
 ---
 
 ## Configuration
